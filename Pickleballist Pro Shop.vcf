@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Card</title>
+</head>
+<body>
+    <script>
+        // Create a function to generate and download the vCard contact
+        function generateContact() {
+            // Customize contact information here
+            var contactData = "BEGIN:VCARD\n" +
+                "VERSION:3.0\n" +
+                "FN:Pickleballist Pro Shop\n" +
+                "ORG:Pickleballist\n" +
+                "TEL:385-213-9133\n" +
+                "EMAIL:support@pickleballist.com\n" +
+                "URL:https://chat.pickleballist.com\n" +
+                "ADR:5612 W 10930 N, Highland, UT 84003\n" +
+                "NOTE:Pickleballist is THE 'One-stop Pickleball Drop' for all the needs of a pickleball player: from paddles, gear, coaching, training, to player development.\n" +
+                "END:VCARD";
+
+            // Create a blob with the contact data
+            var blob = new Blob([contactData], { type: 'text/vcard' });
+
+            // Create a link element to trigger the download
+            var link = document.createElement('a');
+            link.setAttribute('href', window.URL.createObjectURL(blob));
+            link.setAttribute('download', 'Pickleballist_Pro_Shop.vcf'); // Change filename if needed
+
+            // Trigger the download
+            link.click();
+        }
+
+        // Automatically generate the contact when the page loads
+        window.onload = function () {
+            generateContact();
+        };
+    </script>
+</body>
+</html>
