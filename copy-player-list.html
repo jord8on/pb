@@ -1,74 +1,14 @@
-<!doctype html>
-<meta charset="utf-8">
-<title>Copy Player List</title>
-<style>
-  body{margin:0;font:16px system-ui,-apple-system,Segoe UI,Roboto}
-  #btn{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-  button{padding:14px 18px;border:0;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.15);font-weight:600;cursor:pointer}
-  .hide{display:none}
-</style>
+<!doctype html><meta charset="utf-8"><title>Copy Player List</title>
+<button id=b>Tap to copy list</button>
 <script>
-(async () => {
-  const raw = decodeURIComponent(location.hash.slice(1) || "");
-  const names = raw.split(",").map(s=>s.trim()).filter(Boolean);
-
-  const short = names.map(full => {
-    const parts = full.replace(/\s+/g," ").trim().split(" ");
-    if (parts.length < 2) return parts[0];
-    const last = parts[parts.length-1];
-    const init = (last.match(/[A-Za-z]/)||[""])[0].toUpperCase();
-    return init ? `${parts[0]} ${init}.` : parts[0];
-  });
-
-  const text = short.map((n,i)=>`${i+1}. ${n}`).join("\n") || "No players";
-
-  // Try modern writeText
-  let copied = false;
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      copied = true;
-    }
-  } catch(e){}
-
-  // Fallback: legacy execCommand copy
-  if (!copied) {
-    try {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.setAttribute("readonly", "");
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      ta.style.left = "-9999px";
-      document.body.appendChild(ta);
-      ta.select();
-      ta.setSelectionRange(0, ta.value.length);
-      copied = document.execCommand("copy");
-      document.body.removeChild(ta);
-    } catch(e){}
-  }
-
-  // If still blocked, show a one-click button (counts as user gesture)
-  if (!copied) {
-    document.body.innerHTML = `<div id="btn"><button id="copy">Tap to copy list</button></div>`;
-    document.getElementById("copy").onclick = async () => {
-      try {
-        if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
-        else {
-          const ta = document.createElement("textarea");
-          ta.value = text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta);
-          ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
-        }
-      } catch(e){}
-      try { window.close(); } catch(e){}
-      // Fallback close attempts
-      setTimeout(()=>{ location.replace("about:blank"); }, 50);
-    };
-    return;
-  }
-
-  // Success path: close quickly
-  try { window.close(); } catch(e){}
-  setTimeout(()=>{ location.replace("about:blank"); }, 50);
-})();
+const raw = decodeURIComponent(location.hash.slice(1)||"");
+const names = raw.split(",").map(s=>s.trim()).filter(Boolean);
+const short = names.map(n=>{const p=n.replace(/\s+/g," ").trim().split(" ");return p.length<2?p[0]:`${p[0]} ${p[p.length-1][0].toUpperCase()}.`;});
+const text = short.map((n,i)=>`${i+1}. ${n}`).join("\n") || "No players";
+b.onclick = async () => { try { await navigator.clipboard.writeText(text); } catch(e){
+  const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity=0; document.body.appendChild(ta);
+  ta.select(); document.execCommand("copy"); ta.remove();
+}
+window.close(); setTimeout(()=>location.replace("about:blank"),50); };
 </script>
+<style>html,body{height:100%;margin:0}button{margin:auto;display:block;padding:14px 18px;border:0;border-radius:12px;font:600 16px system-ui;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.15)}</style>
