@@ -6,6 +6,88 @@
 <title>Copy Player List</title>
 <style>
   :root {
+    --bg: #ffffff;   /* <- change this to any color */
+    --btn: #9900FF;
+  }
+  html, body {
+    min-height: 100%;
+    margin: 0;
+    background: var(--bg) !important; /* force background */
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  }
+  /* Button 20% from top, centered horizontally */
+  #copyBtn, #done {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  #copyBtn { top: 20vh; }
+  #done { top: calc(20vh + 56px); display: none; }
+
+  button {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--btn);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  button:hover { transform: translateX(-50%) translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+  button:active { transform: translateX(-50%) translateY(1px);  box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+</style>
+</head>
+<body>
+  <button id="copyBtn">📝 Copy Players List</button>
+  <div id="done">✅ Copied to clipboard!</div>
+
+<script>
+(() => {
+  const raw = decodeURIComponent(location.hash.slice(1) || "");
+  const names = raw.split(",").map(s=>s.trim()).filter(Boolean);
+  const short = names.map(n=>{
+    const p=n.replace(/\s+/g," ").trim().split(" ");
+    if(p.length<2) return p[0];
+    return `${p[0]} ${p[p.length-1][0].toUpperCase()}.`;
+  });
+  const text = short.map((n,i)=>`${i+1}. ${n}`).join("\n") || "No players found.";
+
+  const copyBtn=document.getElementById("copyBtn");
+  const done=document.getElementById("done");
+
+  async function doCopy(){
+    // clear hash so re-clicking reloads cleanly
+    history.replaceState(null,"",location.pathname + "#");
+    try { await navigator.clipboard.writeText(text); }
+    catch(e){
+      const ta=document.createElement("textarea");
+      ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta);
+      ta.select(); document.execCommand("copy"); ta.remove();
+    }
+    copyBtn.style.display="none";
+    done.style.display="block";
+    setTimeout(()=>{ window.close(); location.replace("about:blank"); },800);
+  }
+
+  // Try auto-copy; if blocked, the button is ready at 20vh
+  doCopy().catch(()=>{});
+  copyBtn.addEventListener("click", doCopy, {once:true});
+})();
+</script>
+</body>
+</html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Copy Player List</title>
+<style>
+  :root {
     --bg: #ffffff;
     --btn: #9900FF;
   }
