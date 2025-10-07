@@ -15,9 +15,11 @@
     background:var(--bg);
     font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     display:flex;
+    flex-direction:column;
     align-items:center;
-    justify-content:center;
+    justify-content:flex-start;
   }
+  body { padding-top:20vh; } /* push content ~20% down */
   button {
     position:relative;
     padding:1rem 2rem;
@@ -44,6 +46,7 @@
     font-weight:600;
     font-size:1.1rem;
     color:#222;
+    margin-top:1rem;
   }
 </style>
 </head>
@@ -53,7 +56,6 @@
 
 <script>
 (() => {
-  // Build player list text from URL hash
   const raw = decodeURIComponent(location.hash.slice(1) || "");
   const names = raw.split(",").map(s=>s.trim()).filter(Boolean);
   const short = names.map(n=>{
@@ -67,27 +69,20 @@
   const done=document.getElementById("done");
 
   async function doCopy(){
-    // Always recreate a unique hash to force reload if re-clicked
     history.replaceState(null,"",location.pathname + "#");
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch(e){
-      // Legacy fallback
+    try { await navigator.clipboard.writeText(text); }
+    catch(e){
       const ta=document.createElement("textarea");
       ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
       document.body.appendChild(ta);
-      ta.select(); document.execCommand("copy");
-      ta.remove();
+      ta.select(); document.execCommand("copy"); ta.remove();
     }
     copyBtn.style.display="none";
     done.style.display="block";
     setTimeout(()=>{ window.close(); location.replace("about:blank"); },800);
   }
 
-  // Try silent auto-copy on load (may fail if browser blocks)
   doCopy().catch(()=>{});
-
-  // User gesture fallback
   copyBtn.addEventListener("click", doCopy, {once:true});
 })();
 </script>
