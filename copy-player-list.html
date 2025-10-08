@@ -1,90 +1,14 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Copy Player List</title>
-<style>
-  :root {
-    --bg: #9900FF;
-    --btn: #00CCFF;
-  }
-  html,body {
-    height:100%;
-    margin:0;
-    background:var(--bg);
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-  }
-  body { padding-top:20vh; } /* push content ~20% down */
-  button {
-    position:relative;
-    padding:1rem 2rem;
-    font-size:1.1rem;
-    font-weight:600;
-    color:#fff;
-    background:var(--btn);
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-    box-shadow:0 6px 20px rgba(0,0,0,0.2);
-    transition:transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  button:hover {
-    transform:translateY(-2px);
-    box-shadow:0 8px 24px rgba(0,0,0,0.25);
-  }
-  button:active {
-    transform:translateY(1px);
-    box-shadow:0 4px 12px rgba(0,0,0,0.2);
-  }
-  #done {
-    display:none;
-    font-weight:600;
-    font-size:1.1rem;
-    color:#222;
-    margin-top:1rem;
-  }
-</style>
-</head>
-<body>
-  <button id="copyBtn">📝 Copy Players List</button>
-  <div id="done">✅ Copied to clipboard!</div>
-
+<!doctype html><meta charset="utf-8"><title>Copy Player List</title>
+<button id=b>Tap to copy list</button>
 <script>
-(() => {
-  const raw = decodeURIComponent(location.hash.slice(1) || "");
-  const names = raw.split(",").map(s=>s.trim()).filter(Boolean);
-  const short = names.map(n=>{
-    const p=n.replace(/\s+/g," ").trim().split(" ");
-    if(p.length<2) return p[0];
-    return `${p[0]} ${p[p.length-1][0].toUpperCase()}.`;
-  });
-  const text = short.map((n,i)=>`${i+1}. ${n}`).join("\n") || "No players found.";
-
-  const copyBtn=document.getElementById("copyBtn");
-  const done=document.getElementById("done");
-
-  async function doCopy(){
-    history.replaceState(null,"",location.pathname + "#");
-    try { await navigator.clipboard.writeText(text); }
-    catch(e){
-      const ta=document.createElement("textarea");
-      ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
-      document.body.appendChild(ta);
-      ta.select(); document.execCommand("copy"); ta.remove();
-    }
-    copyBtn.style.display="none";
-    done.style.display="block";
-    setTimeout(()=>{ window.close(); location.replace("about:blank"); },800);
-  }
-
-  doCopy().catch(()=>{});
-  copyBtn.addEventListener("click", doCopy, {once:true});
-})();
+const raw = decodeURIComponent(location.hash.slice(1)||"");
+const names = raw.split(",").map(s=>s.trim()).filter(Boolean);
+const short = names.map(n=>{const p=n.replace(/\s+/g," ").trim().split(" ");return p.length<2?p[0]:`${p[0]} ${p[p.length-1][0].toUpperCase()}.`;});
+const text = short.map((n,i)=>`${i+1}. ${n}`).join("\n") || "No players";
+b.onclick = async () => { try { await navigator.clipboard.writeText(text); } catch(e){
+  const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity=0; document.body.appendChild(ta);
+  ta.select(); document.execCommand("copy"); ta.remove();
+}
+window.close(); setTimeout(()=>location.replace("about:blank"),50); };
 </script>
-</body>
-</html>
+<style>html,body{height:100%;margin:0}button{margin:auto;display:block;padding:14px 18px;border:0;border-radius:12px;font:600 16px system-ui;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.15)}</style>
